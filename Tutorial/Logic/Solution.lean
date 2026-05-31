@@ -21,23 +21,70 @@ theorem and_comm' (P Q : Prop) : P ∧ Q → Q ∧ P := by
   intro h
   exact ⟨h.right, h.left⟩
 
-theorem and_assoc' (P Q R : Prop) : P ∧ Q ∧ R → (P ∧ Q) ∧ R := by sorry
+theorem and_assoc' (P Q R : Prop) : P ∧ Q ∧ R → (P ∧ Q) ∧ R := by
+  intro h
+  exact ⟨⟨h.left, h.right.left⟩, h.right.right⟩
 
-theorem impl_and (P Q R : Prop) : (P → Q ∧ R) → (P → Q) ∧ (P → R) := by sorry
-theorem and_impl (P Q R : Prop) : (P → Q) ∧ (P → R) → (P → Q ∧ R) := by sorry
-corollary (P Q R : Prop) : (P → Q) ∧ (P → R) ↔ (P → Q ∧ R) := by sorry
+theorem impl_and (P Q R : Prop) : (P → Q ∧ R) → (P → Q) ∧ (P → R) := by
+  intro pqr
+  constructor
+  . intro p
+    exact (pqr p).left
+  . intro p
+    exact (pqr p).right
+
+theorem and_impl (P Q R : Prop) : (P → Q) ∧ (P → R) → (P → Q ∧ R) := by
+  intro h
+  intro p
+  exact ⟨h.left p, h.right p⟩
+
+corollary (P Q R : Prop) : (P → Q) ∧ (P → R) ↔ (P → Q ∧ R) := by
+  constructor
+  . apply and_impl
+  . apply impl_and
 end Conjunction
 
 namespace Disjunction
-theorem left_impl (P Q : Prop) : P → P ∨ Q := by sorry
-theorem right_impl (P Q : Prop) : Q → P ∨ Q := by sorry
+theorem left_impl (P Q : Prop) : P → P ∨ Q := by
+  intro p
+  exact Or.inl p
 
-theorem or_comm (P Q : Prop) : P ∨ Q → Q ∨ P := by sorry
-theorem or_assoc (P Q R : Prop) : P ∨ Q ∨ R → (P ∨ Q) ∨ R := by sorry
+theorem right_impl (P Q : Prop) : Q → P ∨ Q := by
+  intro q
+  exact Or.inr q
 
-theorem impl_or (P Q R : Prop) : (P → Q ∨ R) → (P → Q) ∨ (P → R) := by sorry
-theorem or_impl (P Q R : Prop) : (P → Q) ∨ (P → R) → (P → Q ∨ R) := by sorry
-corollary (P Q R : Prop) : (P → Q) ∨ (P → R) ↔ (P → Q ∨ R) := by sorry
+theorem or_comm (P Q : Prop) : P ∨ Q → Q ∨ P := by
+  intro h
+  cases h with
+  | inl p => exact Or.inr p
+  | inr q => exact Or.inl q
+
+theorem or_assoc (P Q R : Prop) : P ∨ Q ∨ R → (P ∨ Q) ∨ R := by
+  intro h
+  cases h with
+  | inl p => exact Or.inl (Or.inl p)
+  | inr qr =>
+    cases qr with
+    | inl q => exact Or.inl (Or.inr q)
+    | inr r => exact Or.inr r
+
+-- NOT PROVABLE!
+theorem impl_or (P Q R : Prop) : (P → Q ∨ R) → (P → Q) ∨ (P → R) := by
+  intro pqr
+  constructor
+  . intro p
+    cases pqr p with
+    | inl q => exact q
+    | inr r => sorry
+
+theorem or_impl (P Q R : Prop) : (P → Q) ∨ (P → R) → (P → Q ∨ R) := by
+  intro h p
+  cases h with
+  | inl pq => exact Or.inl (pq p)
+  | inr pr => exact Or.inr (pr p)
+
+-- NOT PROVABLE!
+-- corollary (P Q R : Prop) : (P → Q) ∨ (P → R) ↔ (P → Q ∨ R) := by sorry
 end Disjunction
 
 namespace Negation

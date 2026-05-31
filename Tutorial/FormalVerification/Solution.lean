@@ -1,4 +1,4 @@
-import Tutorial.FP.Definition
+import Tutorial.FormalVerification.Definition
 
 theorem fusion (f : α → β) (g : β → γ) : (map g) ∘ (map f) = map (g ∘ f) := by
   funext xs
