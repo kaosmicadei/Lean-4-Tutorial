@@ -69,13 +69,13 @@ theorem or_assoc (P Q R : Prop) : P ∨ Q ∨ R → (P ∨ Q) ∨ R := by
     | inr r => exact Or.inr r
 
 -- NOT PROVABLE!
-theorem impl_or (P Q R : Prop) : (P → Q ∨ R) → (P → Q) ∨ (P → R) := by
-  intro pqr
-  constructor
-  . intro p
-    cases pqr p with
-    | inl q => exact q
-    | inr r => sorry
+-- theorem impl_or (P Q R : Prop) : (P → Q ∨ R) → (P → Q) ∨ (P → R) := by
+--   intro pqr
+--   constructor
+--   . intro p
+--     cases pqr p with
+--     | inl q => exact q
+--     | inr r => sorry
 
 theorem or_impl (P Q R : Prop) : (P → Q) ∨ (P → R) → (P → Q ∨ R) := by
   intro h p
