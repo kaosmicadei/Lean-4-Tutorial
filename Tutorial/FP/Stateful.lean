@@ -40,18 +40,18 @@ def get [Inhabited α] : Stack α α :=
 
 namespace VirtualMachine
 def call : Stack α β → Stack α β := id
-
 def ret (x : α) : Stack α α := pure x
 
-def s_add : Stack Nat Nat := do
+def add : Stack Nat Nat := do
   let a ← get
   let b ← get
   ret (a + b)
 
-def test : Stack Nat Nat := do
+def prog : Stack Nat Nat := do
   put 1
   put 2
-  call s_add
+  let r <- call add
+  ret r
 
-#eval test.run []
+#eval prog.run []
 end VirtualMachine
