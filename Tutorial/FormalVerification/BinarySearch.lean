@@ -38,23 +38,6 @@ left for special cases where termination is not obvious, and we don't want to
 spend time proving it.
 -/
 
-partial def binarySearch' : List Nat → Nat → Option Nat
-  | [], _ => none
-  | xs, x =>
-    let mid := xs.length / 2
-    match xs[mid]? with
-    | none => none
-    | some y =>
-      if x < y then
-        binarySearch' (xs.take mid) x
-      else if x > y then
-        binarySearch' (xs.drop (mid + 1)) x
-      else
-        some mid
-
-#eval binarySearch' [1, 2, 3, 4, 5] 3
-#eval binarySearch' [1, 2, 3, 4, 5] 6
-
 def Sorted (xs : List Nat) : Prop :=
   ∀ i j : Fin xs.length,
     i < j → j < xs.length → xs.get i ≤ xs.get j

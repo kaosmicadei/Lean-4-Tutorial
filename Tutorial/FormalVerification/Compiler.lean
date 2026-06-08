@@ -60,14 +60,14 @@ def emptyStack : Stack α := ⟨[]⟩
 /--
 The `push` function adds an element of type `α` on top of a stack `s`.
 -/
-def push (a : α) (s : Stack α) : Stack α := ⟨a::s.data⟩
+def Stack.push (a : α) (s : Stack α) : Stack α := ⟨a::s.data⟩
 
 /--
 The `pop` function removes the top element of the stack and returns it along
 with the rest of the stack, which can be used later. If the stack is empty,
 it returns `none`.
 -/
-def pop (s : Stack α) : Option (α × Stack α) :=
+def Stack.pop (s : Stack α) : Option (α × Stack α) :=
   match s.data with
   | [] => none
   | a::rest => some ⟨a, ⟨rest⟩⟩
@@ -76,8 +76,8 @@ def pop (s : Stack α) : Option (α × Stack α) :=
 Pushing an element to a stack and then popping it must return the original stack
 and the pushed element.
 -/
-theorem pop_push (a : α) (s : Stack α) : pop (push a s) = some ⟨a, s⟩ := by
-  rw [push, pop]   -- Expand the definition of `push` and `pop` and simplify.
+theorem Stack.pop_push (a : α) (s : Stack α) : (s.push a).pop = some ⟨a, s⟩ := by
+  rw [Stack.push, Stack.pop]   -- Expand the definition of `push` and `pop` and simplify.
 
 /--
 Our stack machine has two instructions:
@@ -101,14 +101,14 @@ about the `run` function later in the proof of the main theorem.
 -/
 def exec (i : Instr) (s : Stack Nat) : Stack Nat :=
   match i with
-  | Instr.push n => push n s
-  | Instr.add =>
-    match pop s with
+  | .push n => s.push n
+  | .add =>
+    match s.pop with
     | none => s
     | some ⟨a, s'⟩ =>
-      match pop s' with
+      match s'.pop with
       | none => s
-      | some ⟨b, s''⟩ => push (a + b) s''
+      | some ⟨b, s''⟩ => s''.push (a + b)
 
 /--
 Executes a list of instructions on a stack returning the resulting stack.
@@ -233,14 +233,14 @@ This is necessary because the `run_append` lemma produces a `run is2 (run is1 s)
 and we need to be able to reason about the inner `run is1 s` as a valid stack.
 -/
 theorem compile_correct_stack (e : Expr) (s : Stack Nat) :
-  run (compile e) s = push (eval e) s := by
+  run (compile e) s = s.push (eval e) := by
   induction e generalizing s with    -- s can be results from previous operations
   | const n => simp [compile, eval, run, exec]
   | add lhs rhs ihl ihr =>
     simp [compile, eval]
     rw [run_append, run_append, ihl, ihr, run, exec]
     simp [run]
-    simp [pop, push]
+    simp [Stack.pop, Stack.push]
     rw [Nat.add_comm]
 
 /--
@@ -249,11 +249,11 @@ returns a stack with a single element which is the result of evaluating the
 expression.
 -/
 theorem compile_correct (e : Expr) :
-  run (compile e) emptyStack = push (eval e) emptyStack := by
+  run (compile e) emptyStack = emptyStack.push (eval e) := by
   exact compile_correct_stack e emptyStack
 
 /-
-This finishes our goal. We have successfully proved that our compiler correctly
+This concludes our goal. We have successfully proved that our compiler correctly
 translates expressions into instructions for our stack machine.
 
 Any change on the instruction set, the expression language, the evaluation
