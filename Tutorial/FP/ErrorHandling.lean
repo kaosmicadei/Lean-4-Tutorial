@@ -14,7 +14,7 @@ def Result.seq (f : Result ε (α → β)) (x : Unit → Result ε α) : Result 
 
 def Result.bind (x : Result ε α) (f : α → Result ε β) : Result ε β :=
   match x with
-  | .Err e => Err e
+  | .Err e => .Err e
   | .Ok a => f a
 
 instance : Functor (Result ε) where
@@ -27,4 +27,4 @@ instance : Applicative (Result ε) where
 instance : Monad (Result ε) where
   bind := Result.bind
 
-#eval (Result.Ok 1 : Result String Nat) >>= (λ_ => Result.Err "failed") >>= (fun x => Result.Ok (x + 1))
+#eval (.Ok 1 : Result String Nat) >>= (fun _ => .Err "failed") >>= (fun x => .Ok (x + 1))
