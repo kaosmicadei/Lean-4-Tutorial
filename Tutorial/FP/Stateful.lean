@@ -65,6 +65,10 @@ instance : Functor (State σ) where
 theorem map_id (x : State σ α) : State.map id x = x := by
   cases x <;> rfl
 
+theorem map_comp (f : α → β) (g : β → γ) (x : State σ α) :
+    State.map g (State.map f x) = State.map (g ∘ f) x := by
+  cases x <;> rfl
+
 /-
 Applicative is a class (in the sense of equivalence class) of computational
 contexts that have two main operations: `pure` and `seq`. These operations
@@ -92,6 +96,21 @@ instance : Applicative (State σ) where
   pure := State.pure
   seq := State.seq
 
+theorem seq_id (x : State σ α) : (pure id) <*> x = x := by
+  cases x <;> rfl
+
+theorem seq_hom (f : α → β) (x : α) :
+  (pure f : State σ (α → β)) <*> (pure x) = pure (f x) := by
+  rfl
+
+theorem seq_inter (u : State σ (α → β)) (y : α) :
+  u <*> (pure y) = (pure fun f => f y) <*> u := by
+  cases u <;> rfl
+
+theorem seq_comp (u : State σ (β → γ)) (v : State σ (α → β)) (w : State σ α) :
+  ((pure (· ∘ ·)) <*> u <*> v <*> w) = (u <*> (v <*> w)) := by
+  cases u <;> cases v <;> cases w <;> rfl
+
 /-
 Monad is a class (in the sense of equivalence class) of computational
 contexts that have a `bind` operation that allows us to chain computations
@@ -109,6 +128,18 @@ the function `f`.
 -/
 instance : Monad (State σ) where
   bind := State.bind
+
+theorem bind_left_id (a : α) (f : α → State σ β) :
+  (pure a >>= f) = f a := by
+  rfl
+
+theorem bind_right_id (m : State σ α) :
+  (m >>= pure) = m := by
+  cases m <;> rfl
+
+theorem bind_assoc (m : State σ α) (f : α → State σ β) (g : β → State σ γ) :
+  ((m >>= f) >>= g) = (m >>= fun x => f x >>= g) := by
+  cases m <;> rfl
 
 /-
 With that, we have two ways to chain stateful computations, using `seq`
@@ -166,11 +197,11 @@ def add : Stack Nat Nat := do
   let b ← get
   ret (a + b)
 
-def prog : Stack Nat Nat := do
+def program : Stack Nat Nat := do
   put 1
   put 2
   let r ← call add
   ret r
 
-#eval prog.run []
+#eval program.run []
 end VirtualMachine
