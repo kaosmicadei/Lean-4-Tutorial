@@ -179,16 +179,47 @@ abbrev Stack α := State (List α)
 empty.
 -/
 def put (x : α) : Stack α Unit :=
-  ⟨fun s => ((), x :: s)⟩
+  ⟨λs ↦ ((), x :: s)⟩
 
 /--
 `get` moves the top value of the the stack to the return value leaving
 the rest of the stack unchanged.
 -/
 def get [Inhabited α] : Stack α α :=
-  ⟨fun s => (s.head!, s.tail)⟩
+  ⟨λs ↦ (s.head!, s.tail)⟩
+
+theorem put_get [Inhabited α] (x : α) : (put x >>= λ_ ↦ get) = pure x := by
+  rfl
 
 namespace VirtualMachine
+/-
+We can use the `Stack` monad to model a stack-based virtual machine. For
+example, we can define a program that pushes two numbers to the stack,
+retrieves them and returns their sum.
+-/
+
+def program1 : Stack Nat Nat := do
+  put 1
+  put 2
+  let a ← get
+  let b ← get
+  pure (a + b)
+
+#eval program1.run []
+
+/-
+To make the program more modular, we can define a function `add` that
+retrieves two numbers from the stack and returns their sum. Then we can
+define a new program that pushes two numbers to the stack, calls `add`
+and returns the result.
+-/
+
+/-
+We define two helper functions `call` and `ret` to make the code closer
+to what we would write in an assembly language. `call` takes a stackful
+computation and executes it, while `ret` takes a value and returns it
+as the result of the computation.
+-/
 def call : Stack α β → Stack α β := id
 def ret (x : α) : Stack α α := pure x
 
@@ -197,11 +228,18 @@ def add : Stack Nat Nat := do
   let b ← get
   ret (a + b)
 
-def program : Stack Nat Nat := do
+def program2 : Stack Nat Nat := do
   put 1
   put 2
   let r ← call add
   ret r
 
-#eval program.run []
+#eval program2.run []
+
+/--
+We can prove that `program1` and `program2` are equivalent by showing that
+they produce the same result for any initial stack.
+-/
+theorem program1_eq_program2 : program1 = program2 := by
+  rfl
 end VirtualMachine
