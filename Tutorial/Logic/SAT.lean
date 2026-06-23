@@ -1,4 +1,4 @@
-example (n : Nat) (h : n ≤ 3) : n % 2 = 0 ↔ n = 0 ∨ n = 2 := by
+theorem even_iff (n : Nat) (h : n ≤ 3) : n % 2 = 0 ↔ n = 0 ∨ n = 2 := by
   constructor
   . -- n is even
     intro h1
@@ -28,7 +28,8 @@ example (n : Nat) (h : n ≤ 3) : n % 2 = 0 ↔ n = 0 ∨ n = 2 := by
     | inl h2 => rw [h2]
     | inr h2 => rw [h2]
 
-example (A B C: Bool) : A ^^ (B ^^ C) = false ↔ (A.toNat + B.toNat + C.toNat) % 2 = 0 := by
+theorem xor_eq_false_iff_even (A B C: Bool) :
+  A ^^ (B ^^ C) = false ↔ (A.toNat + B.toNat + C.toNat) % 2 = 0 := by
   constructor
   . decide +revert
   . decide +revert
