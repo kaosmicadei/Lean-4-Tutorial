@@ -3,6 +3,10 @@ import Std
 /-!
 From L. de Moura and S Ullrich, "The Lean 4 Theorem Prover and Programming
 Language" https://link.springer.com/chapter/10.1007/978-3-030-79876-5_37
+
+The goal of this file is to show how to use Lean to define a simple symbolic
+language and a simplification procedure for it, and to prove that the
+simplification procedure preserves the meaning of expressions.
 -/
 
 inductive BoolExpr where
