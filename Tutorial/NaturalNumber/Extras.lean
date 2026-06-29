@@ -15,3 +15,8 @@ theorem div_two_mod_2_dvd_by_four
     simp at l2
     apply Nat.dvd_of_mod_eq_zero
     rw [l2, Nat.mul_mod, Nat.mod_self, Nat.zero_mul]
+
+
+example (a b : Nat) : (a+b)*(a-b) = a*a - b*b := by
+  rw [Nat.mul_sub, Nat.add_mul, Nat.add_mul]
+  rw [Nat.mul_comm b a, Nat.add_comm (a*b), Nat.add_sub_add_right]
