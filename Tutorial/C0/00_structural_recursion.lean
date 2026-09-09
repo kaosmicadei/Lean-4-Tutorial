@@ -149,6 +149,7 @@ theorem map_length (f : α → β) (xs : List α) : (map f xs).length = xs.lengt
   induction xs with
   | nil => trivial
   | cons x xs ih =>  -- ih : induction hypothesis
+    -- rewrite [map, List.length, List.length, Nat.add_right_cancel_iff]
     simp [map]
     rw [ih]
 
@@ -156,6 +157,7 @@ theorem map_id (xs : List α) : map id xs = xs := by
   induction xs with
   | nil => trivial
   | cons x xs ih =>
+    -- rewrite [map, id, List.cons.injEq]; simp [true_and]
     simp [map]
     rw [ih]
 
@@ -163,6 +165,7 @@ theorem map_associative (f : α → β) (xs ys : List α) : map f (xs ++ ys) = m
   induction xs with
   | nil => trivial
   | cons x xs ih =>
+    -- rewrite [List.cons_append, map, map, List.cons_append, List.cons.injEq]; simp [true_and]
     simp [map]
     rw [ih]
 
@@ -170,6 +173,7 @@ theorem map_comp (f : α → β) (g : β → γ) (xs : List α) : map g (map f x
   induction xs with
   | nil => trivial
   | cons x xs ih =>
+    -- rewrite [map, map, map, Function.comp, List.cons.injEq]; simp [true_and]
     simp [map]
     rw [ih]
 
