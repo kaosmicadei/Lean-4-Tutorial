@@ -6,11 +6,13 @@ I think a good way to learn Lean is by creating your own version of the natural 
 a good view on: inductive types, constructors, pattern matching, recursion, and allows to explore
 basics of theorem proving with proves that forces you to think step by step.
 
-This file goes shows a basic construction of the natural numbers, explains the use of pattern matching and recursion to implement addition and multiplication, and some unnecessarily verbose
+This file goes shows a basic construction of the natural numbers, explains the use of pattern
+matching and recursion to implement addition and multiplication, and some unnecessarily verbose
 step-by-step proofs so the reader can follows the reasoning process.
 
 A good reminder is that Lean is designed to be used interactively, that means the proves here assume
-the reader is using VS Code with the Lean extension. That way, one can put the cursor in a particular part of the proof and see how the context changes in the Lean InfoView tab in real time.
+the reader is using VS Code with the Lean extension. That way, one can put the cursor in a
+particular part of the proof and see how the context changes in the Lean InfoView tab in real time.
 Also, hovering the mouse over expression and tactics can show additional information that are really
 insightful to understand Lean's internal workings.
 
@@ -74,7 +76,8 @@ The addition between two natural numbers has two rules:
 * `succ m + n = succ (m + n)`
 
 Because Lean is a functional programming language, we can abuse of pattern matching and recursion
-to define `add(m, n)`. Think of pattern matching as a more descriptive if-else list that uses deconstructor statements, and recursion as a structural way to perform loops.
+to define `add(m, n)`. Think of pattern matching as a more descriptive if-else list that uses
+deconstructor statements, and recursion as a structural way to perform loops.
 -/
 
 def ℕ.add (m n : ℕ) : ℕ :=
@@ -87,7 +90,8 @@ Now that we had defined the addition function for natural numbers, it's conventi
 our `ℕ` type to the `Add` typeclass. That will allow us to use the `+` notation for addition and
 write `m + n` instead of `ℕ.add m n`.
 
-In functional programming languages like Lean, typeclasses allow to create polymorphism by defining generic interfaces that can be implemented for different types. `Add`, for example, allows to any
+In functional programming languages like Lean, typeclasses allow to create polymorphism by defining
+generic interfaces that can be implemented for different types. `Add`, for example, allows to any
 type implementing some sort of addition operation to use the `+` operator with the only constraint
 being the addition must be a monoid, `+ : A × A → A`.
 -/
@@ -96,7 +100,8 @@ instance : Add ℕ where
   add := ℕ.add
 
 /-
-The definition of a function can be used by the Lean's compiler to simplify expressions and prove theorems automatically. But they cannot be used as propositions directly. And be able to be used as
+The definition of a function can be used by the Lean's compiler to simplify expressions and prove
+theorems automatically. But they cannot be used as propositions directly. And be able to be used as
 a proposition is important so we can rewrite expressions.
 
 In order to use the definition of addition as propositions, we need to define the cases as separated
@@ -107,7 +112,8 @@ theorem ℕ.zero_add (n : ℕ) : .zero + n = n := by trivial
 theorem ℕ.succ_add (m n : ℕ) : .succ m + n = .succ (m + n) := by trivial
 
 /-
-Because this propositions can be derived directly from the definitions, we can be trivially proven using the `trivial` tactic.
+Because this propositions can be derived directly from the definitions, we can be trivially proven
+using the `trivial` tactic.
 
 To name the theorems, I'm using the Mathlib convention where we name the mathematical fact and name
 the main objects. In this case, when we have `0 + n`, the main object is zero and the mathematical
@@ -119,7 +125,8 @@ Now, let's see how we can use the `ℕ.zero_add` and `ℕ.succ_add` theorems to 
 of the addition of natural numbers.
 
 ### Associativity of addition
-The first proof that we can derive directly from `ℕ.zero_add` and `ℕ.succ_add` is the associativity of addition.
+The first proof that we can derive directly from `ℕ.zero_add` and `ℕ.succ_add` is the associativity
+of addition.
 
 Again, following the name convention of Mathlib, we name the theorem as `add_assoc`. The main
 object here is the addition operation itself, and the mathematical fact is the associativity.
@@ -183,7 +190,8 @@ def ℕ.mul (m n : ℕ) : ℕ :=
   | .succ m' => n + ℕ.mul m' n
 
 /-
-Then we instantiate our natural number type to the `Mul` typeclass so that we can use the `*` notation for multiplication.
+Then we instantiate our natural number type to the `Mul` typeclass so that we can use the `*`
+notation for multiplication.
 -/
 
 instance : Mul ℕ where
@@ -220,7 +228,8 @@ theorem ℕ.mul_comm (m n : ℕ) : m * n = n * m := by
 
 /-
 ### Distributive property of multiplication over addition
-Before we be able to prove the associativity of multiplication, we first establish the distributive property over addition.
+Before we be able to prove the associativity of multiplication, we first establish the distributive
+property over addition.
 
 The distributive property is defined in two ways: with the multiplication on the left of the
 addition and with the multiplication on the right of the addition.
@@ -264,9 +273,11 @@ theorem ℕ.mul_assoc (m n k : ℕ) : (m * n) * k = m * (n * k) := by
 /-
 # Summary
 Here, we had a glimpse of Lean and it can be used to prove some mathematical statements. We have
-seen how to use inductive types by defining our own version of the natural numbers, and how to prove basic properties of addition and multiplication using induction.
+seen how to use inductive types by defining our own version of the natural numbers, and how to
+prove basic properties of addition and multiplication using induction.
 
 In reality, we don't need to define the natural numbers ourselves or prove these basic properties
 from scratch. Lean's standard library already provides a well-defined natural number type, `Nat`
-along with proofs of these fundamental properties. The Mathlib library also has its own definition of natural numbers, `ℕ`, and provides a rich set of tools for working with them.
+along with proofs of these fundamental properties. The Mathlib library also has its own definition
+of natural numbers, `ℕ`, and provides a rich set of tools for working with them.
 -/
