@@ -1,4 +1,7 @@
 /-
+> 🚨*Disclaimer*🚨 This file was written following the literal programming style. That means it is
+> supposed to be read as a prose rather than a regular source code.
+
 I think a good way to learn Lean is by creating your own version of the natural numbers. This gives
 a good view on: inductive types, constructors, pattern matching, recursion, and allows to explore
 basics of theorem proving with proves that forces you to think step by step.
@@ -27,6 +30,9 @@ inductive ℕ : Type where
   | succ : ℕ → ℕ
 
 /-
+> *Notation hint.* Lean accepts unicode symbols entered with LaTeX style. You can use `\N` for `ℕ`
+> and `\r` for `→`.
+
 By definition, `zero` and `succ` produces different objects of type `ℕ`. And we can use this
 structural difference to prove one of the Peano's axioms:
 
@@ -37,14 +43,14 @@ theorem ℕ.zero_ne_succ (n : ℕ) : ℕ.zero ≠ ℕ.succ n := by
   dsimp          -- expands definitions, in this case the definition of ≠
   unfold Not     -- replaces ¬ with its definition
   intro h        -- moves the proposition `ℕ.zero = ℕ.succ n` to the context under the name `h`
-  contradiction  -- verifies the structural contradiction of `ℕ.zero` and `ℕ.succ`
+  contradiction  -- verifies the structural contradiction of `ℕ.zero = ℕ.succ n`
 
 /-
 The proof above is too verbose on purpose, to show the step-by-step reasoning in Lean. In practice,
 Lean's compiler is way more powerful and could infer the structural contradiction automatically
 during simplification. That would look like this:
 
-    theorem ℕ.zero_ne_succ' (n : ℕ) : ℕ.zero ≠ ℕ.succ n := by simp
+    theorem ℕ.zero_ne_succ (n : ℕ) : ℕ.zero ≠ ℕ.succ n := by simp
 
 But, for someone learning, it's nice to see the mechanics behind the magic. Even if all the
 compiler details are still hidden from the user.
@@ -108,10 +114,19 @@ the main objects. In this case, when we have `0 + n`, the main object is zero an
 fact is the addition, so we name the theorem `zero_add`. The order also have a utility here, it
 serves to show which one appears first in the expression.
 
-## Properties of Addition
-
+## Properties of addition
+Now, let's see how we can use the `ℕ.zero_add` and `ℕ.succ_add` theorems to prove some properties
+of the addition of natural numbers.
 
 ### Associativity of addition
+The first proof that we can derive directly from `ℕ.zero_add` and `ℕ.succ_add` is the associativity of addition.
+
+Again, following the name convention of Mathlib, we name the theorem as `add_assoc`. The main
+object here is the addition operation itself, and the mathematical fact is the associativity.
+
+Associativity is proved by induction. Lean has a special pattern matching syntax for induction that
+handles the base case, where `m = 0`, and the inductive case, where `m = succ m'` that also
+provides an induction hypothesis `ih` about `m'`.
 -/
 
 theorem ℕ.add_assoc (m n k : ℕ) : (m + n) + k = m + (n + k) := by
@@ -120,7 +135,22 @@ theorem ℕ.add_assoc (m n k : ℕ) : (m + n) + k = m + (n + k) := by
   | succ m' ih => rw [ℕ.succ_add, ℕ.succ_add, ℕ.succ_add, ih]
 
 /-
+The `rw` tactic is used to rewrite expressions using propositions. In this case, it uses
+`ℕ.zero_add` to replace the first occurrence of `.zero + x` with just `x`. After each rewrite, `rw`
+tries to verify if the goal has reached an obvious truth, like `x = x`.
+
 ### Commutativity of addition
+The commutativity of addition is proved in three steps.
+
+First, we prove that addition commutes with zero, i.e., `n + 0 = n`. We name this theorem
+`ℕ.add_zero` to state that addition precedes zero in the expression.
+
+Next, we prove that addition commutes with the successor, i.e., `n + succ m = succ (n + m)` a
+theorem we name `ℕ.add_succ`.
+
+Finally, we use all the previous theorems involving zero and the successor to prove the
+commutativity of addition. We call this theorem `ℕ.add_comm` where the addition operation itself is
+the main object and the mathematical fact is the commutativity.
 -/
 
 theorem ℕ.add_zero (n : ℕ) : n + .zero = n := by
@@ -140,6 +170,11 @@ theorem ℕ.add_comm (m n : ℕ) : m + n = n + m := by
 
 /-
 # Multiplication of Natural Numbers
+After the addition, the next basic arithmetic operation is the multiplication of two natural
+numbers.
+
+Here we proceed like we did for addition. First, we define the multiplication operation using
+pattern matching and recursion.
 -/
 
 def ℕ.mul (m n : ℕ) : ℕ :=
@@ -147,21 +182,35 @@ def ℕ.mul (m n : ℕ) : ℕ :=
   | .zero => .zero
   | .succ m' => n + ℕ.mul m' n
 
+/-
+Then we instantiate our natural number type to the `Mul` typeclass so that we can use the `*` notation for multiplication.
+-/
+
 instance : Mul ℕ where
   mul := ℕ.mul
+
+/-
+And we state the propositions based on the definition of multiplication.
+-/
 
 theorem ℕ.zero_mul (n : ℕ) : .zero * n = .zero := by trivial
 theorem ℕ.succ_mul (m n : ℕ) : .succ m * n = n + (m * n) := by trivial
 
--- Commutativity of multiplication
+/-
+## Properties of multiplication
+
+### Commutativity of multiplication
+Like in the addition case, the commutativity of multiplication is proved in three steps.
+-/
+
 theorem ℕ.mul_zero (n : ℕ) : n * .zero = .zero := by
   induction n with
-  | zero => trivial
-  | succ n' ih => rw [ℕ.succ_mul, ih, ℕ.add_zero]
+  | zero => rw [ℕ.zero_mul]  -- by definition, `trivial` would also work here
+  | succ n' ih => rw [ℕ.succ_mul, ih, ℕ.zero_add]
 
 theorem ℕ.mul_succ (m n : ℕ) : m * .succ n = m * n + m := by
   induction m with
-  | zero => trivial
+  | zero => rw [ℕ.zero_mul, ℕ.zero_mul, ℕ.zero_add]  -- `trivial` would also work here
   | succ m' ih => rw [ℕ.succ_mul, ℕ.succ_mul, ih, ℕ.succ_add, ℕ.add_succ, ℕ.add_assoc]
 
 theorem ℕ.mul_comm (m n : ℕ) : m * n = n * m := by
@@ -169,22 +218,55 @@ theorem ℕ.mul_comm (m n : ℕ) : m * n = n * m := by
   | zero => rw [ℕ.zero_mul, ℕ.mul_zero]
   | succ m' ih => rw [ℕ.succ_mul, ih, ℕ.mul_succ, ℕ.add_comm]
 
--- Distrubutive
+/-
+### Distributive property of multiplication over addition
+Before we be able to prove the associativity of multiplication, we first establish the distributive property over addition.
+
+The distributive property is defined in two ways: with the multiplication on the left of the
+addition and with the multiplication on the right of the addition.
+-/
+
 theorem ℕ.mul_add (m n k : ℕ) : m * (n + k) = m * n + m * k := by
   induction m with
-  | zero => trivial
+  | zero => rw [ℕ.zero_mul, ℕ.zero_mul, ℕ.zero_mul, ℕ.zero_add]  -- `trivial` would also work here
   | succ m' ih =>
     rw [ℕ.succ_mul, ℕ.succ_mul, ℕ.succ_mul, ih]
     rw [ℕ.add_comm k, ℕ.add_assoc, ℕ.add_comm k]
     rw [← ℕ.add_assoc, ← ℕ.add_assoc, ← ℕ.add_assoc]
 
-theorem ℕ.add_mul (m n k : ℕ) : (m + n) * k = m * k + n * k := by
-  induction m with
-  | zero => trivial
-  | succ m' ih => rw [ℕ.succ_add, ℕ.succ_mul, ℕ.succ_mul, ih, ← ℕ.add_assoc]
+/-
+The `←` indicates we want to use the proposition on reverse. When `rw` sees a proposition like
+`a = b`, it replaces the first occurrence of `a` with `b`. When we use `← a = b`, it goes in the
+opposite direction and replaces the first occurrence of `b` with `a`.
+-/
 
--- Associativity of multiplication
+theorem ℕ.add_mul (m n k : ℕ) : (m + n) * k = m * k + n * k := by
+  rw [ℕ.mul_comm (m + n), ℕ.mul_comm m, ℕ.mul_comm n]
+  exact ℕ.mul_add k m n
+
+/-
+`ℕ.add_mul` does something clever here. It uses the fact that we have already proven the
+commutativity of multiplication to transform the problem into a form where we can apply `ℕ.mul_add`.
+Then, it states the solution is exactly `ℕ.mul_add` with the arguments rotated.
+
+Since the multiplication appears multiple times and they are not eliminated by each rewrite, we
+specify the first argument of each term to avoid driving the compiler crazy.
+
+### Associativity of multiplication
+The last property we will prove in this file is the associativity of multiplication.
+-/
+
 theorem ℕ.mul_assoc (m n k : ℕ) : (m * n) * k = m * (n * k) := by
   induction m with
-  | zero => trivial
+  | zero => rw [ℕ.zero_mul, ℕ.zero_mul, ℕ.zero_mul]  -- `trivial` would also work here
   | succ m' ih => rw [ℕ.succ_mul, ℕ.succ_mul, ℕ.add_mul, ih]
+
+/-
+# Summary
+Here, we had a glimpse of Lean and it can be used to prove some mathematical statements. We have
+seen how to use inductive types by defining our own version of the natural numbers, and how to prove basic properties of addition and multiplication using induction.
+
+In reality, we don't need to define the natural numbers ourselves or prove these basic properties
+from scratch. Lean's standard library already provides a well-defined natural number type, `Nat`
+along with proofs of these fundamental properties. The Mathlib library also has its own definition of natural numbers, `ℕ`, and provides a rich set of tools for working with them.
+-/
