@@ -4,13 +4,13 @@
 
 I think a good way to learn Lean is by creating your own version of the natural numbers. This gives
 a good view on: inductive types, constructors, pattern matching, recursion, and allows to explore
-basics of theorem proving with proves that forces you to think step by step.
+basics of theorem proving with proofs that forces you to think step by step.
 
-This file goes shows a basic construction of the natural numbers, explains the use of pattern
+This file shows a basic construction of the natural numbers, explains the use of pattern
 matching and recursion to implement addition and multiplication, and some unnecessarily verbose
 step-by-step proofs so the reader can follows the reasoning process.
 
-A good reminder is that Lean is designed to be used interactively, that means the proves here assume
+A good reminder is that Lean is designed to be used interactively, that means the proofs here assume
 the reader is using VS Code with the Lean extension. That way, one can put the cursor in a
 particular part of the proof and see how the context changes in the Lean InfoView tab in real time.
 Also, hovering the mouse over expression and tactics can show additional information that are really
@@ -112,12 +112,12 @@ theorem ℕ.zero_add (n : ℕ) : .zero + n = n := by trivial
 theorem ℕ.succ_add (m n : ℕ) : .succ m + n = .succ (m + n) := by trivial
 
 /-
-Because this propositions can be derived directly from the definitions, we can be trivially proven
-using the `trivial` tactic.
+Because these propositions can be derived directly from the definitions, they can be trivially
+proven using the `trivial` tactic.
 
 To name the theorems, I'm using the Mathlib convention where we name the mathematical fact and name
 the main objects. In this case, when we have `0 + n`, the main object is zero and the mathematical
-fact is the addition, so we name the theorem `zero_add`. The order also have a utility here, it
+fact is the addition, so we name the theorem `zero_add`. The order also has a utility here, as it
 serves to show which one appears first in the expression.
 
 ## Properties of addition
@@ -228,7 +228,7 @@ theorem ℕ.mul_comm (m n : ℕ) : m * n = n * m := by
 
 /-
 ### Distributive property of multiplication over addition
-Before we be able to prove the associativity of multiplication, we first establish the distributive
+Before we are able to prove the associativity of multiplication, we first establish the distributive
 property over addition.
 
 The distributive property is defined in two ways: with the multiplication on the left of the
