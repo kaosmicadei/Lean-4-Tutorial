@@ -1,5 +1,5 @@
 /-
-> 🚨*Disclaimer*🚨 This file was written following the literal programming style. That means it is
+> 🚨*Disclaimer*🚨 This file was written following the literate programming style. That means it is
 > supposed to be read as a prose rather than a regular source code.
 
 I think a good way to learn Lean is by creating your own version of the natural numbers. This gives

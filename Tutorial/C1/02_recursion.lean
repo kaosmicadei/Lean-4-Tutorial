@@ -1,5 +1,5 @@
 /-
-> 🚨*Disclaimer*🚨 This file was written following the literal programming style. That means it is
+> 🚨*Disclaimer*🚨 This file was written following the literate programming style. That means it is
 > supposed to be read as a prose rather than a regular source code.
 
 As a reminder is that Lean is designed to be used interactively, that means the proofs here assume
@@ -113,7 +113,8 @@ In the case when `xs = []`, the term `map f xs` gets replaced by `[]` (following
 `map`) and the term `xs ++ ys` gets replaced by `[] ++ ys` (following the definition of `++`). That
 reaches a trivial equality, `map f ys = map f ys`.
 
-When `xs = x :: xs'`, the term `map f (xs ++ ys)` gets replaced by `f x :: map f (xs' ++ ys)` (following the definition of `map` and `++`). The term `(map f xs) ++ (map f ys)` gets replaced by
+When `xs = x :: xs'`, the term `map f (xs ++ ys)` gets replaced by `f x :: map f (xs' ++ ys)`
+(following the definition of `map` and `++`). The term `(map f xs) ++ (map f ys)` gets replaced by
 `f x :: (map f xs' ++ map f ys)` (also following the definition of `map`).
 
 That means we have `f x :: map f (xs' ++ ys) = f x :: (map f xs' ++ map f ys)`.
@@ -123,9 +124,9 @@ only if `x = y` and `xs = ys`. That means the equality is also verified recursiv
 the list. How the compiler doesn't get crazy with that? Simple... Induction hypothesis!
 
 At this point, the goal reduces to `f x = f x ∧ map f (xs' ++ ys) = (map f xs' ++ map f ys)`. By
-breaking the goal into its two components, the first goal, `f x = f x`, is trivially true, and the
-second goal `map f (xs' ++ ys) = (map f xs' ++ map f ys)` is exactly the induction hypothesis. That
-is enough to the compiler to conclude the proof.
+breaking the goal into its two components using the `constructor` tactic, the first goal,
+`f x = f x`, is trivially true, and the second goal `map f (xs' ++ ys) = (map f xs' ++ map f ys)`
+is exactly the induction hypothesis. That is enough to the compiler to conclude the proof.
 
 Now, let's see how this pattern applies to other recursive functions, such as `fold` by proving the
 associativity of `fold`.
@@ -142,16 +143,17 @@ theorem fold_assoc (f : β → α → β) (acc : β) (xs ys : List α) :
     exact ih
 
 /-
-Here we see something new compared to the `map` example. The induction hypothesis needs to generalise the accumulator `acc`. Why? Glad that you asked.
+Here we see something new compared to the `map` example. The induction hypothesis needs to
+generalise the accumulator `acc`. Why? Glad that you asked.
 
 When we use the induction over `xs`, when `xs = []`, the definition of `++` and `fold` both reduce
-the expression to `fold f acc ys = fold f acc ys`.
+the goal to `fold f acc ys = fold f acc ys`.
 
 However, when `xs = x :: xs'`, the term `fold f acc (xs ++ ys)` gets replaced by
 `fold f (f acc x) (xs' ++ ys)` and the term `fold f (fold f acc (x :: xs')) ys` gets replaced by
 `fold f (fold f (f acc x) xs') ys`.
 
-The problems is that the induction hypothesis, without the generalisation, is:
+The problems with that is the induction hypothesis, without the generalisation, is:
 
     ih : fold f acc (xs' ++ ys) = fold f (fold f acc xs') ys
 
@@ -162,7 +164,7 @@ But when we add the `generalizing acc` clause to the induction, the induction hy
 
     ih : ∀ acc, fold f acc (xs' ++ ys) = fold f (fold f acc xs') ys
 
-Now we can point that the generic `acc` is in fact `f acc x` using the `specialize` tactic.
+And now we can point that the generic `acc` is in fact `f acc x` using the `specialize` tactic.
 
 Actually, it compiler now could infer by it itself without the need for the `specialize` tactic, but
 the idea here was to show the step-by-step reasoning so the reader could see how the generalization
