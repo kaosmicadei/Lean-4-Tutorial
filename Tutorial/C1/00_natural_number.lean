@@ -86,7 +86,7 @@ def ℕ.add (m n : ℕ) : ℕ :=
   | .succ m' => .succ (ℕ.add m' n)
 
 /-
-Now that we had defined the addition function for natural numbers, it's conventient to instantiate
+Now that we had defined the addition function for natural numbers, it's convenient to instantiate
 our `ℕ` type to the `Add` typeclass. That will allow us to use the `+` notation for addition and
 write `m + n` instead of `ℕ.add m n`.
 
